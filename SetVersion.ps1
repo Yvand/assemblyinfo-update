@@ -8,7 +8,7 @@ $githubOutput = $Env:GITHUB_OUTPUT
 function SetVersion($file)
 {
 	$contents = [System.IO.File]::ReadAllText($file)
-	$contents = [Regex]::Replace($contents, 'AssemblyFileVersion\("\d+\.\d+\.(\*|(\d+(\.\*|\.\d+)?))', 'Version("' + $version)
+	$contents = [Regex]::Replace($contents, 'AssemblyFileVersion\("\d+\.\d+\.(\*|(\d+(\.\*|\.\d+)?))', 'AssemblyFileVersion("' + $version)
 	$match = [Regex]::Match($contents, $version)
 	if ($match.success)
 	{
