@@ -1,5 +1,7 @@
 # AssemblyInfo Update
 
+Forked in order to set version number only on property `AssemblyFileVersion`.
+
 ## set-version
 
 This Github action updates _AssemblyInfo.cs_ files in .NET projects with the specified version number, suffixed with [`github.run_number`](https://docs.github.com/en/actions/learn-github-actions/contexts).
