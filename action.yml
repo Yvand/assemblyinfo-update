@@ -17,6 +17,9 @@ inputs:
   recursive:
     description: 'If `true`, update all assembly info files including in files in subdirectories'
     default: true
+  copyright:
+    description: 'Copyright to set'
+    default: ''
 runs:
   using: composite
   steps:
@@ -28,6 +31,7 @@ runs:
         FILENAME: ${{ inputs.filename }}
         RECURSIVE:  ${{ inputs.recursive }}
         RUN_NUMBER: ${{ github.run_number }}
+        COPYRIGHT:  ${{ inputs.copyright }}
       run: ${{ github.action_path }}\SetVersion.ps1
 outputs:
   version:

@@ -4,6 +4,7 @@ $fileName = $Env:FILENAME
 $recursive = [System.Convert]::ToBoolean($Env:RECURSIVE)
 $runNumber = $Env:RUN_NUMBER
 $githubOutput = $Env:GITHUB_OUTPUT
+$copyright = $Env:COPYRIGHT
 
 function SetVersion($file)
 {
@@ -12,6 +13,11 @@ function SetVersion($file)
 	$match = [Regex]::Match($contents, $version)
 	if ($match.success)
 	{
+		# Set the copyright
+		if ($false -eq [String]::IsNullOrEmpty($copyright)) {
+			$contents = [Regex]::Replace($contents, 'AssemblyCopyright\(".+', 'AssemblyCopyright("' + $copyright + """)]")
+		}
+
 		$streamWriter = New-Object System.IO.StreamWriter($file, $false, [System.Text.Encoding]::GetEncoding("utf-8"))
 		$streamWriter.Write($contents)
 		$streamWriter.Close()

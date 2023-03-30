@@ -1,6 +1,6 @@
 # AssemblyInfo Update
 
-Forked in order to set version number only on property `AssemblyFileVersion`.
+Forked in order to set version number only on property `AssemblyFileVersion` and add var `copyright`.
 
 ## set-version
 
