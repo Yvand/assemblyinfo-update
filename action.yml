@@ -30,7 +30,7 @@ runs:
         DIRECTORY:  ${{ inputs.directory }}
         FILENAME: ${{ inputs.filename }}
         RECURSIVE:  ${{ inputs.recursive }}
-        RUN_NUMBER: ${{ github.run_number }}
+        # RUN_NUMBER: ${{ github.run_number }}
         COPYRIGHT:  ${{ inputs.copyright }}
       run: ${{ github.action_path }}\SetVersion.ps1
 outputs:
