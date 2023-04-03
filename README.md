@@ -1,6 +1,10 @@
 # AssemblyInfo Update
 
-Forked in order to set version number only on property `AssemblyFileVersion` and add var `copyright`.
+## Changed in this fork compared to original:
+
+- Set version number only on property `AssemblyFileVersion`
+- Add var `copyright`
+- Remove Github run_number
 
 ## set-version
 
