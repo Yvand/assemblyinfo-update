@@ -1,6 +1,6 @@
 # AssemblyInfo Update
 
-## Changes made in this fork:
+## Changes made in this fork
 
 - Set version number only on property `AssemblyFileVersion`
 - Add var `copyright`
