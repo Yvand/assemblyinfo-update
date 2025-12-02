@@ -1,43 +1,27 @@
-$version = $Env:VERSION
 $directory = $Env:DIRECTORY
 $fileName = $Env:FILENAME
-$recursive = [System.Convert]::ToBoolean($Env:RECURSIVE)
-$githubOutput = $Env:GITHUB_OUTPUT
+$assemblyVersion = $Env:ASSEMBLY_VERSION
+$assemblyFileVersion = $Env:ASSEMBLY_FILE_VERSION
 $copyright = $Env:COPYRIGHT
+$recursive = ([String]::IsNullOrEmpty($Env:RECURSIVE)) ? $false : [System.Convert]::ToBoolean($Env:RECURSIVE)
+$githubOutput = $Env:GITHUB_OUTPUT
 
 function SetVersion($file)
 {
-	$contents = [System.IO.File]::ReadAllText($file)
-	$contents = [Regex]::Replace($contents, 'AssemblyFileVersion\("\d+\.\d+\.(\*|(\d+(\.\*|\.\d+)?))', 'AssemblyFileVersion("' + $version)
-	$match = [Regex]::Match($contents, $version)
-	if ($match.success)
-	{
-		# Set the copyright
-		if ($false -eq [String]::IsNullOrEmpty($copyright)) {
-			$contents = [Regex]::Replace($contents, 'AssemblyCopyright\(".+', 'AssemblyCopyright("' + $copyright + """)]")
-		}
-
-		$streamWriter = New-Object System.IO.StreamWriter($file, $false, [System.Text.Encoding]::GetEncoding("utf-8"))
-		$streamWriter.Write($contents)
-		$streamWriter.Close()
-
-		Write-Output "version=$version" >> $githubOutput
-		Write-Host "$file is now set to version $version"
+	$contents = [System.IO.File]::ReadAllText($file.FullName)
+	$contents = [Regex]::Replace($contents, '(AssemblyVersion\(").*("\)])', "`${1}$assemblyVersion`${2}", [System.Text.RegularExpressions.RegexOptions] "Multiline, IgnoreCase")
+	$contents = [Regex]::Replace($contents, '(AssemblyFileVersion\(").*("\)])', "`${1}$assemblyFileVersion`${2}", [System.Text.RegularExpressions.RegexOptions] "Multiline, IgnoreCase")
+	if ($false -eq [String]::IsNullOrEmpty($copyright)) {
+		$contents = [Regex]::Replace($contents, '(AssemblyCopyright\(").*("\)])', "`${1}$copyright`${2}", [System.Text.RegularExpressions.RegexOptions] "Multiline, IgnoreCase")
 	}
-	else
-	{
-		Write-Host "Version has not been set correctly for $file"
-	}
-}
 
-$isSemVer = [Regex]::Match($version, '^\d+\.\d+(\.\d+)?')
-if ($isSemVer.success)
-{
-	$version = $isSemVer.Value
-}
-else
-{
-	Write-Host "Version number '$version' is invalid for use in assembly info versions"
+	$streamWriter = New-Object System.IO.StreamWriter($file.FullName, $false, [System.Text.Encoding]::GetEncoding("utf-8"))
+	$streamWriter.Write($contents)
+	$streamWriter.Close()
+
+	Write-Output "assemblyVersion=$assemblyVersion" >> $githubOutput
+	Write-Output "assemblyFileVersion=$assemblyFileVersion" >> $githubOutput
+	Write-Host "$file updated with assemblyVersion '$assemblyVersion' and assemblyFileVersion '$assemblyFileVersion'"
 }
 
 if ($recursive)
@@ -53,5 +37,3 @@ else
 	$file = Get-ChildItem $directory -Filter $fileName | Select-Object -First 1
 	SetVersion($file)
 }
-
-
