@@ -38,6 +38,7 @@ function SetVersion($file) {
 	Write-Output "assemblyVersion=$assemblyVersion" >> $githubOutput
 	Write-Output "assemblyFileVersion=$assemblyFileVersion" >> $githubOutput
 	if ($doUpdate) {
+		$streamWriter = New-Object System.IO.StreamWriter($file.FullName, $false, [System.Text.Encoding]::GetEncoding("utf-8"))
 		$streamWriter.Write($contents)
 		$streamWriter.Close()
 		Write-Host "$($file.FullName) was updated: assemblyVersion: '$assemblyVersion', assemblyFileVersion: '$assemblyFileVersion'"
