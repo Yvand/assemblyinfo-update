@@ -1,37 +1,46 @@
 $directory = $Env:DIRECTORY
 $fileName = $Env:FILENAME
-$version = $Env:VERSION
+$assemblyVersion = $Env:ASSEMBLY_VERSION
+$assemblyFileVersion = $Env:ASSEMBLY_FILE_VERSION
 $copyright = $Env:COPYRIGHT
 $recursive = ([String]::IsNullOrEmpty($Env:RECURSIVE)) ? $false : [System.Convert]::ToBoolean($Env:RECURSIVE)
 $githubOutput = $Env:GITHUB_OUTPUT
-$assemblyFileVersion = $version
 
 function SetVersion($file) {
 	$contents = [System.IO.File]::ReadAllText($file.FullName)
-	$contents = [Regex]::Replace($contents, '(AssemblyVersion\(").*("\)])', "`${1}$version`${2}", [System.Text.RegularExpressions.RegexOptions] "Multiline, IgnoreCase")
-	$contents = [Regex]::Replace($contents, '(AssemblyFileVersion\(").*("\)])', "`${1}$assemblyFileVersion`${2}", [System.Text.RegularExpressions.RegexOptions] "Multiline, IgnoreCase")
-	if ($false -eq [String]::IsNullOrEmpty($copyright)) {
-		$contents = [Regex]::Replace($contents, '(AssemblyCopyright\(").*("\)])', "`${1}$copyright`${2}", [System.Text.RegularExpressions.RegexOptions] "Multiline, IgnoreCase")
+	$doUpdate = $false
+
+	if (![String]::IsNullOrEmpty($assemblyVersion)) {
+		$contents = [Regex]::Replace($contents, '(AssemblyVersion\(").*("\)])', "`${1}$assemblyVersion`${2}", [System.Text.RegularExpressions.RegexOptions] "Multiline, IgnoreCase")
+		$doUpdate = $true
+	} else {
+		$versionInFile = [Regex]::Match($version, '^\[assembly: AssemblyVersion\("(.*)"\)]')
+		if ($versionInFile.success -and $versionInFile.Count -eq 2) {
+			$assemblyVersion = $versionInFile.Groups[1].Value
+		}
 	}
 
-	$streamWriter = New-Object System.IO.StreamWriter($file.FullName, $false, [System.Text.Encoding]::GetEncoding("utf-8"))
-	$streamWriter.Write($contents)
-	$streamWriter.Close()
-
-	Write-Output "assemblyVersion=$version" >> $githubOutput
-	Write-Output "assemblyFileVersion=$assemblyFileVersion" >> $githubOutput
-	Write-Host "$file updated with assemblyVersion '$version' and assemblyFileVersion '$assemblyFileVersion'"
-}
-
-$patternExactSemver = '^\d+\.\d+(\.\d+)*$'
-$patternStartsWithSemver = '^\d+\.\d+(\.\d+)*'
-$isSemVer = [Regex]::Match($version, $patternExactSemver)
-if ($false -eq $isSemVer.success) {
-	$startsWithSemVer = [Regex]::Match($version, $patternStartsWithSemver)
-	if ($startsWithSemVer.success) {
-		$version = $startsWithSemVer.Value
+	if (![String]::IsNullOrEmpty($assemblyFileVersion)) {
+		$contents = [Regex]::Replace($contents, '(AssemblyFileVersion\(").*("\)])', "`${1}$assemblyFileVersion`${2}", [System.Text.RegularExpressions.RegexOptions] "Multiline, IgnoreCase")
+		$doUpdate = $true
 	} else {
-		Write-Host "Version number '$version' is invalid for use in assembly info versions"
+		$versionInFile = [Regex]::Match($version, '^\[assembly: AssemblyFileVersion\("(.*)"\)]')
+		if ($versionInFile.success -and $versionInFile.Count -eq 2) {
+			$assemblyFileVersion = $versionInFile.Groups[1].Value
+		}
+	}
+
+	if (![String]::IsNullOrEmpty($copyright)) {
+		$contents = [Regex]::Replace($contents, '(AssemblyCopyright\(").*("\)])', "`${1}$copyright`${2}", [System.Text.RegularExpressions.RegexOptions] "Multiline, IgnoreCase")
+		$doUpdate = $true
+	}
+
+	Write-Output "assemblyVersion=$assemblyVersion" >> $githubOutput
+	Write-Output "assemblyFileVersion=$assemblyFileVersion" >> $githubOutput
+	if ($doUpdate) {
+		$streamWriter.Write($contents)
+		$streamWriter.Close()
+		Write-Host "$($file.FullName) was updated: assemblyVersion: '$assemblyVersion', assemblyFileVersion: '$assemblyFileVersion'"
 	}
 }
 
