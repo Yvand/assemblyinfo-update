@@ -1,31 +1,25 @@
 # AssemblyInfo Update
 
-## Changes made in this fork
-
-- Set version number only on property `AssemblyFileVersion`
-- Add var `copyright`
-- Remove Github run_number
-
 ## set-version
 
-This Github action updates _AssemblyInfo.cs_ files in .NET projects with the specified version number, suffixed with [`github.run_number`](https://docs.github.com/en/actions/learn-github-actions/contexts).
-
-The version number is expected to be in [SemVer format](https://semver.org/) with at least the major and minor version numbers, e.g. `1.20`, `2.17.4`, `1.4.9-alpha`.  Any pre-release/metadata suffix will be discarded and [`github.run_number`](https://docs.github.com/en/actions/learn-github-actions/contexts) appended to produce a 3- or 4-element version number.
-
-Note that any existing value in the file is overwritten, so may be left at, say, "0.0.0.0".  The updated file is not committed back to the repository.
-
-This action is useful for automatically updating the assembly info version of a project prior to building it, for example, where the version number should be set to the latest tag.
+This Github action updates _AssemblyInfo.cs_ files in .NET projects with the specified version number.  It sets both the **AssemblyVersion** and the **AssemblyFileVersion**.  
+**AssemblyFileVersion** is always set using the input parameter `version` as-is.
+**AssemblyVersion** is set using the input parameter `version`:
+- If `version` is exactly a semVer: Used as-is
+- If `version` is not a semVer: Try to extract a semver from `version`. For example: `1.2.3.4` if `version` is `1.2.3.4-preview.1`
 
 ### Input arguments
 
-* `version` (required): The assembly version in semver format
+* `version` (required): The assembly version
+* `copyright`: The copyright to set
 * `directory`: the directory where the assembly info file is located (or the top-most directory to search if `recursive` is `true`).  Defaults to '.\\'
 * `filename`: the file name of the assembly info file.  Defaults to 'AssemblyInfo.cs'
 * `recursive`: if `true`, updates all assembly info files matching the `filename` argument, in all subdirectories.  Defaults to `true`
 
 ### Output arguments
 
-* `version`: the value of the version used in the assembly info
+* `assembly_version`: Version set in AssemblyVersion
+* `assembly_file_version`: Version set in AssemblyFileVersion
 
 ### Example Usage
 
@@ -33,7 +27,7 @@ This action is useful for automatically updating the assembly info version of a 
 
 ```yml
 - name: Set version in all AssemblyInfo.cs files
-  uses: secondbounce/assemblyinfo-update@v2
+  uses: Yvand/assemblyinfo-update@v3
   with:
     version: '1.0.8'
 ```
@@ -43,15 +37,17 @@ This action is useful for automatically updating the assembly info version of a 
 ```yml
 - name: Set version in .\Properties\SharedAssemblyInfo.cs
   id: set-assembly-version
-  uses: secondbounce/assemblyinfo-update@v2
+  uses: Yvand/assemblyinfo-update@v3
   with:
     version: '2.1.16-alpha'
     directory: '.\Properties'
     filename: 'SharedAssemblyInfo.cs'
     recursive: false
 
-- name: Display the version used
-  run: echo "{{steps.set-assembly-version.outputs.version}}"
+- name: Display the versions set
+  run: |
+    echo "assembly_version: {{steps.set-assembly-version.outputs.assembly_version}}"
+    echo "assembly_file_version: {{steps.set-assembly-version.outputs.assembly_file_version}}"
 ```
 
 ## Development Testing
