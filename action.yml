@@ -1,12 +1,14 @@
 name: 'Set AssemblyInfo Version'
-author: 'Second Bounce'
 description: 'Sets the assembly version number in the specified assembly info file(s)'
 branding:
   icon: 'tag'
   color: 'orange'
 inputs:
-  version:
-    description: 'Assembly version in SemVer format'
+  assembly_version:
+    description: 'version to set in AssemblyVersion, in SemVer format'
+    required: true
+  assembly_file_version:
+    description: 'version to set in AssemblyFileVersion'
     required: true
   directory:
     description: 'Directory where assembly info file is located'
@@ -26,14 +28,18 @@ runs:
     - shell: pwsh
       id: setversion
       env:
-        VERSION:  ${{ inputs.version }}
+        ASSEMBLY_VERSION:  ${{ inputs.assembly_version }}
+        ASSEMBLY_FILE_VERSION:  ${{ inputs.assembly_file_version }}
         DIRECTORY:  ${{ inputs.directory }}
         FILENAME: ${{ inputs.filename }}
         RECURSIVE:  ${{ inputs.recursive }}
         COPYRIGHT:  ${{ inputs.copyright }}
       run: ${{ github.action_path }}\SetVersion.ps1
 outputs:
-  version:
-    description: Version applied to assembly info
-    value: ${{steps.setversion.outputs.version}}
+  assembly_version:
+    description: Version set in AssemblyVersion
+    value: ${{steps.setversion.outputs.assembly_version}}
+  assembly_file_version:
+    description: Version set in AssemblyFileVersion
+    value: ${{steps.setversion.outputs.assembly_file_version}}
     
