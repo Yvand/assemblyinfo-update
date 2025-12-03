@@ -38,8 +38,8 @@ runs:
 outputs:
   assembly_version:
     description: Version set in AssemblyVersion
-    value: ${{steps.setversion.outputs.assembly_version}}
+    value: ${{steps.setversion.outputs.assemblyVersion}}
   assembly_file_version:
     description: Version set in AssemblyFileVersion
-    value: ${{steps.setversion.outputs.assembly_file_version}}
+    value: ${{steps.setversion.outputs.assemblyFileVersion}}
     
