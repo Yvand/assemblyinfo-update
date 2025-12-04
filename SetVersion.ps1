@@ -15,7 +15,7 @@ function SetVersion($file) {
 		$doUpdate = $true
 	} else {
 		$versionInFile = [Regex]::Match($contents, '^\[assembly: AssemblyVersion\("(.*)"\)]', [System.Text.RegularExpressions.RegexOptions] "Multiline, IgnoreCase")
-		if ($versionInFile.success -and $versionInFile.Count -eq 2) {
+		if ($versionInFile.success -and $versionInFile.Groups.Count -eq 2) {
 			$assemblyVersion = $versionInFile.Groups[1].Value
 		}
 	}
@@ -25,7 +25,7 @@ function SetVersion($file) {
 		$doUpdate = $true
 	} else {
 		$versionInFile = [Regex]::Match($contents, '^\[assembly: AssemblyFileVersion\("(.*)"\)]', [System.Text.RegularExpressions.RegexOptions] "Multiline, IgnoreCase")
-		if ($versionInFile.success -and $versionInFile.Count -eq 2) {
+		if ($versionInFile.success -and $versionInFile.Groups.Count -eq 2) {
 			$assemblyFileVersion = $versionInFile.Groups[1].Value
 		}
 	}
