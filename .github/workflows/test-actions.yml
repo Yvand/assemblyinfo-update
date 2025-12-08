@@ -3,7 +3,7 @@ name: test-actions
 on:
   push:
     branches:
-      - develop
+      - dev
       - main
   pull_request:
   workflow_dispatch:

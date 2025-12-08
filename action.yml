@@ -4,9 +4,10 @@ branding:
   icon: 'tag'
   color: 'orange'
 inputs:
-  version:
-    description: 'version to set'
-    required: true
+  assembly_version:
+    description: 'version to set in AssemblyVersion, in SemVer format'
+  assembly_file_version:
+    description: 'version to set in AssemblyFileVersion'
   directory:
     description: 'Directory where assembly info file is located'
     default: '.\'
@@ -25,7 +26,8 @@ runs:
     - shell: pwsh
       id: setversion
       env:
-        VERSION:  ${{ inputs.version }}
+        ASSEMBLY_VERSION:  ${{ inputs.assembly_version }}
+        ASSEMBLY_FILE_VERSION:  ${{ inputs.assembly_file_version }}
         DIRECTORY:  ${{ inputs.directory }}
         FILENAME: ${{ inputs.filename }}
         RECURSIVE:  ${{ inputs.recursive }}
